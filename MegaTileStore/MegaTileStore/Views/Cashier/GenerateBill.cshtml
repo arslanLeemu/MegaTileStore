@@ -1,0 +1,80 @@
+﻿@using MegaTileStore.Models
+@{ 
+    var order = (Order)ViewBag.Order;
+    var ledger = (LedgerCustomer)ViewBag.Ledger;
+}
+
+<div class="row main-panel">
+    <div class="col-xs-12 col-md-7 left-panel">
+        <form class="form-horizontal" method="post" onsubmit="return validateForm()" action="@Url.Action("GenerateBill")" id="orderform">
+            
+            <input type="hidden" name="order_id" value="@order.Id" />
+
+            <div class="form-group">
+                <label class="control-label col-md-4">Amount Payable</label>
+                <div class="col-md-8">
+                    <input type="number" min="0" step="0.01" name="amount_payable" id="amount_payable" readonly value="@order.AmountPayable" class="form-control input-lg" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-4">Amount Paid</label>
+                <div class="col-md-8">
+                    <input type="number" min="0" step="0.01" name="amount_paid" id="amount_paid" class="form-control input-lg" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-4">Bill Balance</label>
+                <div class="col-md-8">
+                    <input type="number" step="0.01" name="bill_balance" id="bill_balance" class="form-control input-lg" readonly value="@order.AmountPayable"/>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <div class="col-xs-12 col-md-5 right-panel">
+        <h3>Bill to <strong>Mr. @order.Customer.Name <small>Ref: @order.CustomerId</small></strong></h3>
+        <hr />
+        <div class="form-horizontal">
+            
+            <div class="form-group">
+                <label class="control-label col-md-4">Previous Balance</label>
+                <div class="col-md-8">
+                    <input type="number" step="0.01" name="previous_balance" id="previous_balance" readonly value="@ledger.Balance" class="form-control input-lg" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-4 col-md-8">
+                    <input type="submit" form="orderform" class="btn btn-lg btn-block btn-primary" value="Generate Bill" />
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('#amount_paid').change(function () {
+            var amountPayable = Number($('#amount_payable').val());
+            var amountPaid = Number($(this).val());
+            var balance = amountPayable - amountPaid;
+            $('#bill_balance').val(balance);
+        });
+
+        function validateForm() {
+            var validated = true;
+            $('.main-panel :input').each(function () {
+                if ($(this).val() === '') {
+                    validated = false;
+                    alert('All the fields are mandatory to fill.');
+                    $(this)[0].focus();
+                    return;
+                }
+            });
+            return validated;
+        }
+    </script>
+}

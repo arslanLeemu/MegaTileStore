@@ -1,0 +1,37 @@
+﻿@using MegaTileStore.Models
+@{
+    var billNo = (int)ViewBag.BillNo;
+    var customer = (Customer)ViewBag.Customer;
+    var orderNo = (int)ViewBag.OrderNo;
+    var payable = (decimal)ViewBag.Payable;
+    var paid = (decimal)ViewBag.Paid;
+    var ledgerBalance = (decimal)ViewBag.LedgerBalance;
+    var username = (string)ViewBag.Username;
+}
+
+<h2>Bill number @billNo has been cashed with the following details:</h2>
+
+<div class="container">
+    <h4>Bill Summary Summary</h4>
+    <dl class="dl-horizontal">
+
+        <dt>Customer</dt>
+        <dd>@customer.Name (@customer.Id)</dd>
+
+        <dt>Order No.</dt>
+        <dd>@orderNo</dd>
+
+        <dt>Amount Payable</dt>
+        <dd>@payable</dd>
+
+        <dt>Amount Paid</dt>
+        <dd>@paid</dd>
+
+        <dt>Ledger Balance</dt>
+        <dd>@ledgerBalance</dd>
+    </dl>
+
+    <hr />
+    <em>The order was generated at @DateTime.Now by sales person @username</em>
+</div>
+

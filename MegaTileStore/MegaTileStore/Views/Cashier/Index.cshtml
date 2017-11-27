@@ -1,0 +1,38 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="container">
+    <h2>Cashier Counter</h2>
+
+    <form class="form-horizontal" style="margin-top: 15%" onsubmit="return validateForm();" id="order_no_form" method="get" action="@Url.Action("GenerateBill")">
+        <div class="form-group">
+            <label class="control-label col-md-4">Enter order No. to continue</label>
+            <div class="col-md-8">
+                <input placeholder="Order#" class="input-lg form-control" id="order_no" name="order_no" type="number" min="0" step="1" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-4 col-md-8">
+                <input type="submit" class="btn btn-primary btn-lg" value="Generate Bill" />
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function validateForm() {
+            if ($('#order_no_form input').val() === '') {
+                alert('Order number not entered. Please enter it to continue');
+                $('#order_no_form input')[0].focus();
+                return false;
+            }
+            return true;
+        }
+    </script>
+
+}
+

@@ -1,0 +1,69 @@
+﻿@using MegaTileStore.Models
+@{ 
+    var orderNo = (int)ViewBag.OrderNo;
+    var customer = (Customer)ViewBag.Customer;
+    var shipmentAddress = (string)ViewBag.ShipmentAddress;
+    var productsCount = (int)ViewBag.ProductCount;
+    var productOrders = (List<ProductOrder>)ViewBag.ProductOrders;
+    var totalPrice = (decimal)ViewBag.TotalPrice;
+    var discount = (decimal)ViewBag.Discount;
+    var shipmentCharges = (decimal)ViewBag.ShipmentCharges;
+    var payable = (decimal)ViewBag.Payable;
+    var time = (DateTime)ViewBag.DateTime;
+    var userName = (string)ViewBag.Username;
+    var products = (System.Data.Entity.DbSet<Product>)ViewBag.Products;
+}
+
+<h2>Order number @orderNo has been processed with the following details:</h2>
+
+<div class="container">
+    <h4>Order Summary</h4>
+    <dl class="dl-horizontal">
+
+        <dt>Customer</dt>
+        <dd>@customer.Name (@customer.Id)</dd>
+
+        <dt>Shipment Address</dt>
+        <dd>@shipmentAddress</dd>
+
+        <dt>Total Products</dt>
+        <dd>@productsCount</dd>
+    </dl>
+
+    <hr />
+
+    <h4>Products Price Summary</h4>
+    <dl class="dl-horizontal">
+
+        @foreach(var po in productOrders)
+        {
+            <dt>@products.Find(po.ProductId).Name (@po.ProductId)</dt>
+            var price = po.UnitPrice;
+            <dd>@price * @po.NoOfBoxes = @(price * po.NoOfBoxes)</dd>
+        }
+
+    </dl>
+
+    <hr />
+
+    <h4>Price Details</h4>
+    <dl class="dl-horizontal">
+        
+        <dt>Shipment Charges</dt>
+        <dd>@shipmentCharges</dd>
+
+        <dt>Total Price</dt>
+        <dd>@totalPrice</dd>
+
+        <dt>Discount</dt>
+        <dd>@discount</dd>
+
+        <dt><strong>Amount Payable</strong></dt>
+        <dd><strong>@payable</strong></dd>
+
+    </dl>
+
+    <hr />
+    <em>The order was generated at @time by sales person @userName</em>
+</div>
+

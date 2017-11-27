@@ -1,0 +1,446 @@
+﻿@using MegaTileStore.Models
+@{
+    ViewBag.Title = "Index";
+    var customers = (List<Customer>)ViewBag.Customers;
+    var products = (List<Product>)ViewBag.Products;
+    var productOptions = "<option value>Select a Product</option>";
+    foreach (var product in products)
+    {
+        productOptions += HttpUtility.JavaScriptStringEncode("<option value = " + product.Id + ">" + product.Name + "</option>");
+    }
+}
+
+<script>
+    var productCount = 1;
+</script>
+
+<h1>Welcome to Sales Counter</h1>
+
+<form action="@Url.Action("GenerateOrder")" method="post" style="display: none" id="salesform" onsubmit="return validateForm();"></form>
+<br />
+<div class="container-fluid main-panel">
+    <div class="row">
+        <div class="form-group">
+            <div class="col-md-2">
+                <select class="form-control input-lg" name="customer_id" id="customer_id">
+                    <option value="">Select a customer</option>
+                    @foreach (var customer in customers)
+                    {
+                        <option value="@customer.Id">@customer.Name</option>
+                    }
+                </select>
+            </div>
+            @*<button type="button" class="btn btn-default" style="font-size:24px">+</button>*@
+            @Html.ActionLink("+", "CreateCustomer", null, new { @class="btn btn-default", style="font-size:24px" })
+        </div>
+
+    </div>
+
+    <hr />
+
+    <div class="container-fluid" id="products-panel">
+        <div class="container-fluid" id="product-1">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="control-label">Product Identifier</label>
+                </div>
+                <div class="col-md-3">
+                    <label class="control-label">Enter Quantity</label>
+                </div>
+                <div class="col-md-3">
+                    <label class="control-label">Unit Price</label>
+                </div>
+                <div class="col-md-3">
+                    <label class="control-label">Total Price</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <input class="input-lg form-control" name="product_id_1" id="product_id_1" type="number" min="0" step="1" />
+                </div>
+
+                <div class="col-md-3">
+                    <input class="input-lg form-control" name="quantity_product_1" id="quantity_product_1" type="number" min="0" step="1" />
+                </div>
+
+                <div class="col-md-3">
+                    <input class="input-lg form-control" name="unit_price_box_1" id="unit_price_box_1" type="number" min="0" step="0.01" />
+                </div>
+
+                <div class="col-md-3">
+                    <input class="input-lg form-control" name="total_price_box_1" id="total_price_box_1" type="number" min="0" step="0.1" readonly />
+                </div>
+
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <button type="button" class="btn btn-default" id="add_product" value="add" style="margin-left:10px; font-size: 24px;"><b>+ Add Product</b></button>
+        </div>
+    </div>
+    <hr />
+    <br />
+    <br />
+    <div id="summary-panel" class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <label class="control-label">Total Products</label>
+            </div>
+            <div class="col-md-3">
+                <label class="control-label">Customer Balance</label>
+            </div>
+            <div class="col-md-3">
+                <label class="control-label">Total Price</label>
+            </div>
+            <div class="col-md-3">
+                <label class="control-label">Payable Amount</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <input type="number" readonly class="form-control input-lg" value="0" name="product_count" id="product_count" />
+            </div>
+            <div class="col-md-3">
+                <input type="number" readonly step="0.01" class="form-control input-lg" value="0.00" name="customer_balance" id="customer_balance" />
+            </div>
+            <div class="col-md-3">
+                <input type="number" step="0.01" readonly class="form-control input-lg" value="0.00" name="total_price" id="total_price" />
+            </div>
+            <div class="col-md-3">
+                <input type="number" readonly step="0.01" class="form-control input-lg" value="0.00" name="amount_payable" id="amount_payable" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <label class="control-label">Shipment Address</label>
+            </div>
+            <div class="col-md-3">
+                <label class="control-label">Shipment Charges</label>
+            </div>
+            <div class="col-md-3">
+                <label class="control-label">Discount</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <textarea name="delivery_address" id="delivery_address" rows="4" class="form-control"></textarea>
+            </div>
+            <div class="col-md-3">
+                <input type="number" step="0.01" class="form-control input-lg" min="0.00" value="0" name="delivery_charges" id="delivery_charges" />
+            </div>
+            <div class="col-md-6">
+                <input type="number" step="0.01" class="form-control input-lg" min="0.00" value="0" name="discount" id="disount" />
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <input type="submit" value="Generate Bill" style="margin-left: 10px;" class="btn btn-primary btn-lg btn-block" />
+        </div>
+    </div>
+</div>
+
+@*<div class="row main-panel">
+    <div class="col-md-6 col-xs-12 left-panel" id="salespanel">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-md-4">Select Customer</label>
+                <div class="col-md-7">
+                    <select class="form-control input-lg" name="customer_id" id="customer_id">
+                        <option value="">Select a customer</option>
+                        @foreach (var customer in customers)
+                        {
+                            <option value="@customer.Id">@customer.Name</option>
+                        }
+                    </select>
+                </div>
+                <hr />
+            </div>
+
+            
+
+            <div id="product-panel" class="container-fluid">
+                <div id="product-1" class="container-fluid">
+                    <div class="form-group row">
+                        <label class="control-label col-md-4">Select Product</label>
+                        <div class="col-md-7">
+                            <select class="form-control input-lg" name="product_id_1" id="product_id_1">
+                                <option value="">Select a product</option>
+                                @foreach (var item in products)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-default" id="add_product" value="add"><b>+</b></button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Enter Quantity</label>
+                        <div class="col-md-7">
+                            <input class="input-lg form-control" name="quantity_product_1" id="quantity_product_1" type="number" min="0" step="1" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Unit Price</label>
+                        <div class="col-md-7">
+                            <input class="input-sm form-control" name="unit_price_box_1" id="unit_price_box_1" type="number" min="0" step="0.01" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Total Price</label>
+                        <div class="col-md-7">
+                            <input class="input-sm form-control" name="total_price_box_1" id="total_price_box_1" type="number" min="0" step="0.1" readonly />
+                        </div>
+                    </div>
+
+                </div>
+                <hr />
+            </div>
+
+        </div>
+
+        
+
+    </div>
+    <div class="col-md-6 col-xs-12" id="summarypanel">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-md-4">Total Products</label>
+                <div class="col-md-8">
+                    <input type="number" readonly class="form-control input-lg" value="0" name="product_count" id="product_count" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-4">Total Price</label>
+                <div class="col-md-8">
+                    <input type="number" step="0.01" readonly class="form-control input-lg" value="0.00" name="total_price" id="total_price" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-4">Discount</label>
+                <div class="col-md-8">
+                    <input type="number" step="0.01" class="form-control input-lg" min="0.00" name="discount" id="disount" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-4">Delivery Address</label>
+                <div class="col-md-8">
+                    <textarea name="delivery_address" id="delivery_address" rows="4" class="form-control"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-4">Delievery Charges</label>
+                <div class="col-md-8">
+                    <input type="number" step="0.01" class="form-control input-lg" min="0.00" name="delivery_charges" id="delivery_charges" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-4">Total Amount Payable</label>
+                <div class="col-md-8">
+                    <input type="number" readonly step="0.01" class="form-control input-lg" value="0.00" name="amount_payable" id="amount_payable" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-4">Customer Balance</label>
+                <div class="col-md-8">
+                    <input type="number" readonly step="0.01" class="form-control input-lg" value="0.00" name="customer_balance" id="customer_balance" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-4 col-md-8">
+                    <input type="submit" value="Generate Bill" class="btn btn-primary btn-lg btn-block" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>*@
+
+@section Scripts
+{
+    
+
+    <script>
+        handleProductDetails(productCount);
+        handleQuantityChange(productCount);
+        handleUnitPriceChange(productCount);
+        handleProductIdChange(productCount);
+        $('#product_count').val(productCount);
+
+        $('.main-panel :input').removeAttr('form');
+        $('.main-panel :input').attr('form', 'salesform');
+
+        $('#customer_id').change(function () {
+            $.ajax({
+                url: '@Url.Action("GetCustomerBalance")',
+                data: {
+                    'cid': $(this).val()
+                },
+                success: function (response) {
+                    if (response === false) {
+                        alert('Customer Id was invalid');
+                    } else {
+                        $('#customer_balance').val(response);
+                    }
+                },
+                error: function (xhr) {
+                    alert('error in getting customer balance');
+                    console.log(xhr);
+                }
+            })
+        });
+
+        $('#add_product').click(function () {
+            
+            productCount++;
+            
+            @*var html = '<div id = "product-' + productCount + '" class = "container-fluid"><div class = "form-group"><label class="control-label col-md-4">Select Product</label><div class = "col-md-7"><select class = "form-control input-lg" name = "product_id_' + productCount + '" id = "product_id_' + productCount + '">@productOptions ' + '</select></div></div><div class = "form-group"><label class = "control-label col-md-4">Enter Quantity</label><div class = "col-md-7"><input class = "input-lg form-control" name = "quantity_product_' + productCount + '" id = "quantity_product_' + productCount + '" type = "number" min = "0" step = "1" /></div></div><div class = "form-group"><label class = "control-label col-md-4">Unit Price</label><div class = "col-md-7"><input class = "input-sm form-control" name = "unit_price_box_' + productCount + '" id = "unit_price_box_' + productCount + '" type = "number" min = "0" step = "0.1"/></div></div><div class = "form-group"><label class = "control-label col-md-4">Total Price</label><div class = "col-md-7"><input class = "input-sm form-control" name = total_price_box_' + productCount + '" id = "total_price_box_' + productCount + '" type = "number" min = "0" step = "0.1" readonly /></div></div><hr /></div>';*@
+
+            var html = '<div class="container-fluid" id=product-' + productCount + '><div class="row"><div class="col-md-3" ><label class="control-label">Product Identifier</label></div ><div class="col-md-3"><label class="control-label">Enter Quantity</label></div><div class="col-md-3"><label class="control-label">Unit Price</label></div><div class="col-md-3"><label class="control-label">Total Price</label></div></div ><div class="row"><div class="col-md-3" ><input class="input-lg form-control" name="product_id_' + productCount + '" id="product_id_' + productCount + '" type="number" min="0" step="1" /></div ><div class="col-md-3"><input class="input-lg form-control" name="quantity_product_' + productCount + '" id="quantity_product_' + productCount + '" type="number" min="0" step="1" /></div><div class="col-md-3"><input class="input-lg form-control" name="unit_price_box_' + productCount + '" id="unit_price_box_' + productCount + '" type="number" min="0" step="0.01" /></div><div class="col-md-3"><input class="input-lg form-control" name="total_price_box_' + productCount + '"id="total_price_box_' + productCount + '" type="number" min="0" step="0.1" readonly /></div></div ></div>';
+
+            var previousDiv = productCount - 1;
+            $(html).insertAfter('#product-' + previousDiv);
+            handleProductDetails(productCount);
+            handleQuantityChange(productCount);
+            handleUnitPriceChange(productCount);
+            handleProductIdChange(productCount);
+            $('#product_count').val(productCount);
+            $('.main-panel :input').removeAttr('form');
+            $('.main-panel :input').attr('form', 'salesform');
+        });
+
+        $('#disount').change(function () {
+            calculateAmountPayable();
+        });
+
+        $('#delivery_charges').change(function () {
+            calculateAmountPayable();
+        });
+
+        $('#total_price').change(function () {
+            alert('hi');
+            calculateAmountPayable();
+        });
+
+        function handleProductIdChange(selectId) {
+            $('#product_id_' + selectId).change(function () {
+                $.ajax({
+                    url: '@Url.Action("IsProductIdValid")',
+                    type: 'GET',
+                    data: {
+                        'productId': $(this).val()
+                    },
+                    success: function (response) {
+                        if (response === false) {
+                            alert('Product Identifier' + $(this).val() + ' does not exist in our system.');
+                            $(this)[0].focus();
+                        }
+                    }
+                })
+            });
+        }
+
+        function handleProductDetails(selectId) {
+            @*$('#product_id_' + selectId).change(function () {
+                $.ajax({
+                    url:  '@Url.Action("GetProductUnitPrice")',
+                    data: {
+                        'pid': $(this).val()
+                    },
+                    success: function (response) {
+                        if (response === false) {
+                            alert('Product id was invalid');
+                        } else {
+                            $('#unit_price_box_' + selectId).val(response);
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('error in getting product unit price');
+                        console.log(xhr);
+                    }
+                })
+            });*@
+        }
+
+        function handleQuantityChange(selectId) {
+            $('#quantity_product_' + selectId).change(function () {
+                var quantity = $(this).val();
+                var unitPrice = $('#unit_price_box_' + selectId).val();
+                var total = quantity * unitPrice;
+                $('#total_price_box_' + selectId).val(total);
+                calculateTotalPrice();
+                calculateAmountPayable();
+            });
+        }
+
+        function handleUnitPriceChange(selectId) {
+            $('#unit_price_box_' + selectId).change(function () {
+                var quantity = $('#quantity_product_' + selectId).val();
+                var unitPrice = $(this).val();
+                var total = quantity * unitPrice;
+                $('#total_price_box_' + selectId).val(total);
+                calculateTotalPrice();
+                calculateAmountPayable();
+            });
+        }
+
+        function calculateTotalPrice() {
+            var total = 0;
+            for (let i = 1; i <= productCount; ++i) {
+                let value = $('#total_price_box_' + i).val();
+                value = value ? Number(value) : 0;
+                total += value;
+            }
+
+            $('#total_price').val(total);
+            
+        }
+
+        function calculateAmountPayable() {
+            var total = 0;
+            for (let i = 1; i <= productCount; ++i) {
+                let value = $('#total_price_box_' + i).val();
+                value = value ? Number(value) : 0;
+                total += value;
+            }
+
+            var discount = $('#disount').val();
+            discount = discount ? Number(discount) : 0;
+            total -= discount;
+
+            var delivery = $('#delivery_charges').val();
+            delivery = delivery ? Number(delivery) : 0;
+            total += delivery;
+            $('#amount_payable').val(total);
+        }
+
+        function validateForm() {
+            var validated = true;
+            var invalidId = '';
+            $('.main-panel :input').each(function () {
+                if ($(this).val() === "") {
+                    invalidId = $(this);
+                    validated = false;
+                    return;
+                }
+            });
+            if (!validated) {
+                alert('There are missing fields in the form.');
+                invalidId[0].focus();
+            }
+
+            return validated;
+        }
+
+    </script>
+}

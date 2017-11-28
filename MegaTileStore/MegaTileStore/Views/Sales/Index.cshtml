@@ -342,8 +342,8 @@
                     },
                     success: function (response) {
                         if (response === false) {
-                            alert('Product Identifier' + $(this).val() + ' does not exist in our system.');
-                            $(this)[0].focus();
+                            alert('Product Identifier that you entered does not exist in our system.');
+                            $('#product_id_' + selectId)[0].focus();
                         }
                     }
                 })

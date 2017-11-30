@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="__MigrationHistory">
           <Key>
             <PropertyRef Name="MigrationId" />
@@ -92,6 +92,9 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="ProductId" Type="int" Nullable="false" />
           <Property Name="NoOfBoxes" Type="int" Nullable="false" />
+          <Property Name="UnitPrice" Type="float" />
+          <Property Name="SupplierId" Type="int" />
+          <Property Name="AmountPayable" Type="float" />
         </EntityType>
         <EntityType Name="LedgerCustomer">
           <Key>
@@ -100,6 +103,15 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="CustomerId" Type="int" Nullable="false" />
           <Property Name="Balance" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LedgerSupplier">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SupplierId" Type="int" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="Balance" Type="nchar" MaxLength="10" />
         </EntityType>
         <EntityType Name="Order">
           <Key>
@@ -133,6 +145,25 @@
           <Property Name="NoOfBoxes" Type="int" Nullable="false" />
           <Property Name="OrderId" Type="int" Nullable="false" />
           <Property Name="UnitPrice" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PurchaseBill">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AmountPaid" Type="float" />
+          <Property Name="Date" Type="datetime" />
+          <Property Name="InventoryId" Type="int" />
+        </EntityType>
+        <EntityType Name="Supplier">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar(max)" />
+          <Property Name="Email" Type="nvarchar(max)" />
+          <Property Name="Phone" Type="nvarchar(max)" />
+          <Property Name="Address" Type="nvarchar(max)" />
         </EntityType>
         <Association Name="FK_Bill_Order">
           <End Role="Order" Type="Self.Order" Multiplicity="1" />
@@ -214,6 +245,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Inventory_Supplier">
+          <End Role="Supplier" Type="Self.Supplier" Multiplicity="0..1" />
+          <End Role="Inventory" Type="Self.Inventory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Supplier">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Inventory">
+              <PropertyRef Name="SupplierId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_LedgerCustomer_Customer">
           <End Role="Customer" Type="Self.Customer" Multiplicity="1" />
           <End Role="LedgerCustomer" Type="Self.LedgerCustomer" Multiplicity="*" />
@@ -223,6 +266,18 @@
             </Principal>
             <Dependent Role="LedgerCustomer">
               <PropertyRef Name="CustomerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ledgerSupplier_Supplier">
+          <End Role="Supplier" Type="Self.Supplier" Multiplicity="0..1" />
+          <End Role="LedgerSupplier" Type="Self.LedgerSupplier" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Supplier">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LedgerSupplier">
+              <PropertyRef Name="SupplierId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -262,6 +317,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_PurchaseBill_Inventory">
+          <End Role="Inventory" Type="Self.Inventory" Multiplicity="0..1" />
+          <End Role="PurchaseBill" Type="Self.PurchaseBill" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Inventory">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PurchaseBill">
+              <PropertyRef Name="InventoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="ModelStoreContainer">
           <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRoles" Schema="dbo" store:Type="Tables" />
@@ -273,9 +340,12 @@
           <EntitySet Name="Customer" EntityType="Self.Customer" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Inventory" EntityType="Self.Inventory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LedgerCustomer" EntityType="Self.LedgerCustomer" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LedgerSupplier" EntityType="Self.LedgerSupplier" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Order" EntityType="Self.Order" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProductOrder" EntityType="Self.ProductOrder" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PurchaseBill" EntityType="Self.PurchaseBill" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Supplier" EntityType="Self.Supplier" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_Bill_Order" Association="Self.FK_Bill_Order">
             <End Role="Order" EntitySet="Order" />
             <End Role="Bill" EntitySet="Bill" />
@@ -300,9 +370,17 @@
             <End Role="Product" EntitySet="Product" />
             <End Role="Inventory" EntitySet="Inventory" />
           </AssociationSet>
+          <AssociationSet Name="FK_Inventory_Supplier" Association="Self.FK_Inventory_Supplier">
+            <End Role="Supplier" EntitySet="Supplier" />
+            <End Role="Inventory" EntitySet="Inventory" />
+          </AssociationSet>
           <AssociationSet Name="FK_LedgerCustomer_Customer" Association="Self.FK_LedgerCustomer_Customer">
             <End Role="Customer" EntitySet="Customer" />
             <End Role="LedgerCustomer" EntitySet="LedgerCustomer" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ledgerSupplier_Supplier" Association="Self.FK_ledgerSupplier_Supplier">
+            <End Role="Supplier" EntitySet="Supplier" />
+            <End Role="LedgerSupplier" EntitySet="LedgerSupplier" />
           </AssociationSet>
           <AssociationSet Name="FK_Order_Customer" Association="Self.FK_Order_Customer">
             <End Role="Customer" EntitySet="Customer" />
@@ -315,6 +393,10 @@
           <AssociationSet Name="FK_ProductOrder_Product" Association="Self.FK_ProductOrder_Product">
             <End Role="Product" EntitySet="Product" />
             <End Role="ProductOrder" EntitySet="ProductOrder" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PurchaseBill_Inventory" Association="Self.FK_PurchaseBill_Inventory">
+            <End Role="Inventory" EntitySet="Inventory" />
+            <End Role="PurchaseBill" EntitySet="PurchaseBill" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -410,7 +492,12 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="ProductId" Type="Int32" Nullable="false" />
           <Property Name="NoOfBoxes" Type="Int32" Nullable="false" />
+          <Property Name="UnitPrice" Type="Double" />
+          <Property Name="SupplierId" Type="Int32" />
+          <Property Name="AmountPayable" Type="Double" />
           <NavigationProperty Name="Product" Relationship="Self.FK_Inventory_ProductId" FromRole="Inventory" ToRole="Product" />
+          <NavigationProperty Name="Supplier" Relationship="Self.FK_Inventory_Supplier" FromRole="Inventory" ToRole="Supplier" />
+          <NavigationProperty Name="PurchaseBills" Relationship="Self.FK_PurchaseBill_Inventory" FromRole="Inventory" ToRole="PurchaseBill" />
         </EntityType>
         <EntityType Name="LedgerCustomer">
           <Key>
@@ -420,6 +507,16 @@
           <Property Name="CustomerId" Type="Int32" Nullable="false" />
           <Property Name="Balance" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
           <NavigationProperty Name="Customer" Relationship="Self.FK_LedgerCustomer_Customer" FromRole="LedgerCustomer" ToRole="Customer" />
+        </EntityType>
+        <EntityType Name="LedgerSupplier">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SupplierId" Type="Int32" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Balance" Type="String" MaxLength="10" FixedLength="true" Unicode="true" />
+          <NavigationProperty Name="Supplier" Relationship="Self.FK_ledgerSupplier_Supplier" FromRole="LedgerSupplier" ToRole="Supplier" />
         </EntityType>
         <EntityType Name="Order">
           <Key>
@@ -460,6 +557,28 @@
           <Property Name="UnitPrice" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
           <NavigationProperty Name="Order" Relationship="Self.FK_ProductOrder_Order" FromRole="ProductOrder" ToRole="Order" />
           <NavigationProperty Name="Product" Relationship="Self.FK_ProductOrder_Product" FromRole="ProductOrder" ToRole="Product" />
+        </EntityType>
+        <EntityType Name="PurchaseBill">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AmountPaid" Type="Double" />
+          <Property Name="Date" Type="DateTime" Precision="3" />
+          <Property Name="InventoryId" Type="Int32" />
+          <NavigationProperty Name="Inventory" Relationship="Self.FK_PurchaseBill_Inventory" FromRole="PurchaseBill" ToRole="Inventory" />
+        </EntityType>
+        <EntityType Name="Supplier">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Phone" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Address" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Inventories" Relationship="Self.FK_Inventory_Supplier" FromRole="Supplier" ToRole="Inventory" />
+          <NavigationProperty Name="LedgerSuppliers" Relationship="Self.FK_ledgerSupplier_Supplier" FromRole="Supplier" ToRole="LedgerSupplier" />
         </EntityType>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
           <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="1">
@@ -537,6 +656,42 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Inventory_Supplier">
+          <End Role="Supplier" Type="Self.Supplier" Multiplicity="0..1" />
+          <End Role="Inventory" Type="Self.Inventory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Supplier">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Inventory">
+              <PropertyRef Name="SupplierId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PurchaseBill_Inventory">
+          <End Role="Inventory" Type="Self.Inventory" Multiplicity="0..1" />
+          <End Role="PurchaseBill" Type="Self.PurchaseBill" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Inventory">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PurchaseBill">
+              <PropertyRef Name="InventoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ledgerSupplier_Supplier">
+          <End Role="Supplier" Type="Self.Supplier" Multiplicity="0..1" />
+          <End Role="LedgerSupplier" Type="Self.LedgerSupplier" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Supplier">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LedgerSupplier">
+              <PropertyRef Name="SupplierId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ProductOrder_Order">
           <End Role="Order" Type="Self.Order" Multiplicity="1" />
           <End Role="ProductOrder" Type="Self.ProductOrder" Multiplicity="*" />
@@ -575,9 +730,12 @@
           <EntitySet Name="Customers" EntityType="Self.Customer" />
           <EntitySet Name="Inventories" EntityType="Self.Inventory" />
           <EntitySet Name="LedgerCustomers" EntityType="Self.LedgerCustomer" />
+          <EntitySet Name="LedgerSuppliers" EntityType="Self.LedgerSupplier" />
           <EntitySet Name="Orders" EntityType="Self.Order" />
           <EntitySet Name="Products" EntityType="Self.Product" />
           <EntitySet Name="ProductOrders" EntityType="Self.ProductOrder" />
+          <EntitySet Name="PurchaseBills" EntityType="Self.PurchaseBill" />
+          <EntitySet Name="Suppliers" EntityType="Self.Supplier" />
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />
@@ -601,6 +759,18 @@
           <AssociationSet Name="FK_Inventory_ProductId" Association="Self.FK_Inventory_ProductId">
             <End Role="Product" EntitySet="Products" />
             <End Role="Inventory" EntitySet="Inventories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Inventory_Supplier" Association="Self.FK_Inventory_Supplier">
+            <End Role="Supplier" EntitySet="Suppliers" />
+            <End Role="Inventory" EntitySet="Inventories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PurchaseBill_Inventory" Association="Self.FK_PurchaseBill_Inventory">
+            <End Role="Inventory" EntitySet="Inventories" />
+            <End Role="PurchaseBill" EntitySet="PurchaseBills" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ledgerSupplier_Supplier" Association="Self.FK_ledgerSupplier_Supplier">
+            <End Role="Supplier" EntitySet="Suppliers" />
+            <End Role="LedgerSupplier" EntitySet="LedgerSuppliers" />
           </AssociationSet>
           <AssociationSet Name="FK_ProductOrder_Order" Association="Self.FK_ProductOrder_Order">
             <End Role="Order" EntitySet="Orders" />
@@ -703,6 +873,9 @@
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="ProductId" ColumnName="ProductId" />
                 <ScalarProperty Name="NoOfBoxes" ColumnName="NoOfBoxes" />
+                <ScalarProperty Name="UnitPrice" ColumnName="UnitPrice" />
+                <ScalarProperty Name="SupplierId" ColumnName="SupplierId" />
+                <ScalarProperty Name="AmountPayable" ColumnName="AmountPayable" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -711,6 +884,16 @@
               <MappingFragment StoreEntitySet="LedgerCustomer">
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+                <ScalarProperty Name="Balance" ColumnName="Balance" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LedgerSuppliers">
+            <EntityTypeMapping TypeName="Model.LedgerSupplier">
+              <MappingFragment StoreEntitySet="LedgerSupplier">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="SupplierId" ColumnName="SupplierId" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="Balance" ColumnName="Balance" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -748,6 +931,27 @@
                 <ScalarProperty Name="NoOfBoxes" ColumnName="NoOfBoxes" />
                 <ScalarProperty Name="OrderId" ColumnName="OrderId" />
                 <ScalarProperty Name="UnitPrice" ColumnName="UnitPrice" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PurchaseBills">
+            <EntityTypeMapping TypeName="Model.PurchaseBill">
+              <MappingFragment StoreEntitySet="PurchaseBill">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="AmountPaid" ColumnName="AmountPaid" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="InventoryId" ColumnName="InventoryId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Suppliers">
+            <EntityTypeMapping TypeName="Model.Supplier">
+              <MappingFragment StoreEntitySet="Supplier">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Phone" ColumnName="Phone" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

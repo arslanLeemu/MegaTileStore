@@ -9,6 +9,8 @@ namespace MegaTileStore.Models
     {
         public static string SalesPerson { get { return "salesperson"; } }
 
+        public static string PurchasePerson { get { return "PurchasePerson"; } }
+
         public static string Cashier { get { return "cashier"; } }
 
         public static string DefaultPassword { get { return "Updating@1234"; } }

@@ -34,8 +34,11 @@ namespace MegaTileStore.Models
         public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<Inventory> Inventories { get; set; }
         public virtual DbSet<LedgerCustomer> LedgerCustomers { get; set; }
+        public virtual DbSet<LedgerSupplier> LedgerSuppliers { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<ProductOrder> ProductOrders { get; set; }
+        public virtual DbSet<PurchaseBill> PurchaseBills { get; set; }
+        public virtual DbSet<Supplier> Suppliers { get; set; }
     }
 }

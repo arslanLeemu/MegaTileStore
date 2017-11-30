@@ -87,6 +87,18 @@ namespace MegaTileStore
             {
                 userManager.AddToRole(cashier.Id, Names.Cashier);
             }
+
+            var purchaseperson = new ApplicationUser
+            {
+                UserName = "purchaseperson",
+                Email = "purchaseperson@leemutech.com"
+            };
+
+            result = userManager.Create(purchaseperson, Names.DefaultPassword);
+            if (result.Succeeded)
+            {
+                userManager.AddToRole(purchaseperson.Id, Names.PurchasePerson);
+            }
         }
     }
 }

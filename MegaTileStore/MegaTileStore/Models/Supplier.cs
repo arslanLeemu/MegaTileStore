@@ -12,24 +12,24 @@ namespace MegaTileStore.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Inventory
+    public partial class Supplier
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Inventory()
+        public Supplier()
         {
-            this.PurchaseBills = new HashSet<PurchaseBill>();
+            this.Inventories = new HashSet<Inventory>();
+            this.LedgerSuppliers = new HashSet<LedgerSupplier>();
         }
     
         public int Id { get; set; }
-        public int ProductId { get; set; }
-        public int NoOfBoxes { get; set; }
-        public Nullable<double> UnitPrice { get; set; }
-        public Nullable<int> SupplierId { get; set; }
-        public Nullable<double> AmountPayable { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public string Address { get; set; }
     
-        public virtual Product Product { get; set; }
-        public virtual Supplier Supplier { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<PurchaseBill> PurchaseBills { get; set; }
+        public virtual ICollection<Inventory> Inventories { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<LedgerSupplier> LedgerSuppliers { get; set; }
     }
 }

@@ -88,6 +88,10 @@ namespace MegaTileStore.Controllers
                     {
                         return RedirectToAction("Index", "Cashier");
                     }
+                    if(UserManager.IsInRole(userID,Names.PurchasePerson))
+                    {
+                        return RedirectToAction("Index", "PurchasePerson");
+                    }
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
